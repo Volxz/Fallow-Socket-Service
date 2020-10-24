@@ -1,0 +1,7 @@
+apiVersion: networking.gke.handlers/v1beta2
+kind: ManagedCertificate
+metadata:
+  name: lb-certificate
+spec:
+  domains:
+    - sslb.excl.dev

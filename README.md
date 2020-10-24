@@ -4,7 +4,7 @@
 
 #### What is fallow ❓
 
-This is the demonized socket application for a COVID-19 fallow timer application. In short, fallow time is how long a dental operatory must sit before aerosols settle and a room is considered "safe". This demonized application helps manage those timers in a multi-tenant concept.
+This is the demonized socket application for a COVID-19 fallow timer application. In short, fallow time is how long a dental operatory must sit before aerosols settle and a room is considered "safe". This daemonized application helps manage those timers in a multi-tenant concept.
 
 #### What is Socket-Service? ⚡
 

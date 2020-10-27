@@ -8,8 +8,11 @@ metadata:
 spec:
   externalTrafficPolicy: Local
   type: LoadBalancer
+  sessionAffinity: ClientIP
   selector:
     app: socket-server
   ports:
-    - port: 80
+    - name: http-port
+      port: 80
       targetPort: 8080
+      protocol: TCP

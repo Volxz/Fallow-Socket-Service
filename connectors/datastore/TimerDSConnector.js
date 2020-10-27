@@ -20,7 +20,7 @@ exports.setup = async ()=> {
 
 exports.update = async (timerData) => {
     console.debug(`Beginning update of timer with dataset ${JSON.stringify(timerData)}`);
-    const {id, name, length, expires_at, color, office} = timerData;
+    const {id, name, length, expires_at, office} = timerData;
     const key = await datastore.key({
         namespace: `office-${office}`,
         path: [type, id]
@@ -28,7 +28,7 @@ exports.update = async (timerData) => {
     const timer = {
         key,
         data: {
-            name, length, expires_at, color, office
+            name, length, expires_at, office
         }
     };
     await datastore.save(timer);
@@ -43,7 +43,7 @@ exports.delete = async (timer, office) => {
 };
 
 exports.create = async (timerData) => {
-    const {id, name, length, expires_at, color, office} = timerData;
+    const {id, name, length, expires_at, office} = timerData;
     const key = await datastore.key({
         namespace: `office-${office}`,
         path: [type, id]
@@ -51,7 +51,7 @@ exports.create = async (timerData) => {
     const timer = {
         key,
         data: {
-            id, name, length, expires_at, color, office
+            name, length, expires_at, office
         }
     };
     await datastore.save(timer);
@@ -67,6 +67,12 @@ exports.get = async (id, office) => {
 
 exports.getAllOfficeTimers = async (officeNum) => {
     const query = datastore.createQuery(`office-${officeNum}`, 'Timer');
-    const data =  await datastore.runQuery(query);
-    return data[0];
+    const [data] =  await datastore.runQuery(query);
+    let idTimers = [];
+    for( let i = 0; i < data.length; i++) {
+        let timer = data[i];
+        timer.id = data[i][datastore.KEY]['name'];
+        idTimers.push(timer);
+    }
+    return idTimers;
 };

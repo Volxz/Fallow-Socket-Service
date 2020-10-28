@@ -6,6 +6,7 @@ const TimerDSConnector = require("../connectors/datastore/TimerDSConnector");
 const RedisManager = require('../connectors/RedisConnector');
 
 const NotificationConnector = require('../connectors/NotificationConnector');
+const logger = require('../Logger');
 
 exports.handleReset = async (socket,id) => {
     if (typeof id !== "string")
@@ -14,7 +15,7 @@ exports.handleReset = async (socket,id) => {
     let timer = await TimerDSConnector.get(id, socket.office);
     if (!timer || !timer[0])
         return;
-    timer = timer[0];
+    logger.debug(`[TimerReset] Resetting Timer ${id}`);
 
     if (typeof timer.notification === "string" && timer.notification) {
         await NotificationConnector.cancelNotification(timer.notification);
@@ -22,7 +23,7 @@ exports.handleReset = async (socket,id) => {
 
     timer.expires_at = await (new Date().getTime() + (timer.length * 1000));
     timer.notification = await NotificationConnector.scheduleNotification(timer);
-    console.debug(`[TimerReset] Resetting Timer ${id} to it's set time of ${timer.length}. Timer data is ${JSON.stringify(timer)}`);
+    logger.debug(`[TimerReset] Resetting Timer ${id} to it's set time of ${timer.length}. Timer data is ${JSON.stringify(timer)}`);
     await TimerDSConnector.update(timer);
     await RedisManager.emitEvent(socket.office, 'timer.updated', timer);
 };
@@ -32,7 +33,7 @@ exports.handleZero = async (socket, id) => {
     let timer = await TimerDSConnector.get(id, socket.office);
     if (!timer || !timer[0])
         return;
-    timer = timer[0];
+    logger.debug(`[TimerZero] Zeroing Timer ${id}`);
     timer.expires_at = 0;
     await TimerDSConnector.update(timer);
     await RedisManager.emitEvent(socket.office, 'timer.updated', timer);
@@ -45,9 +46,7 @@ exports.handleDelete = async (socket, id) => {
     let timer = await TimerDSConnector.get(id, socket.office);
     if (!timer || !timer[0])
         return;
-    timer = timer[0];
-    console.debug(`[TimerDelete] Deleting timer with id ${id}`);
-    console.log("Timer data currently is " +  JSON.stringify(timer));
+    logger.debug(`[TimerDelete] Deleting timer with id ${id}`);
     await TimerDSConnector.delete(timer, socket.office);
     await RedisManager.emitEvent(socket.office, 'timer.deleted', timer);
     if (typeof timer.notification === "string" && timer.notification) {

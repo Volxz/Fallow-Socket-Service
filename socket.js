@@ -1,6 +1,5 @@
 const io = require('socket.io')(process.env.PORT || "8080");
 const logger = require('./Logger');
-
 const SecretConnector = require('./connectors/SecretConnector');
 const RedisConnector = require('./connectors/RedisConnector');
 const NotificationConnector = require('./connectors/NotificationConnector');
@@ -21,12 +20,11 @@ const main = async () => {
     await AuthHandler.setup();
     //
 
-
     // Handle daemon exit
     registerExitHandlers();
 
     io.on('connection', socket => {
-            logger.info(`Socket ${socket.id} connected! IP: ${socket.handshake.headers['x-forwarded-for'] || socket.handshake.address}`);
+            console.log(`Socket ${socket.id} connected! IP: ${socket.handshake.headers['x-forwarded-for'] || socket.handshake.address}`);
             // Authentication
             setTimeout(() => {
                 if (!socket.office) {
@@ -64,11 +62,11 @@ const main = async () => {
                     const newOfficeCount = _clientsPerOffice.get(officeNum) - 1;
                     RedisConnector.adjustClientCount(officeNum, -1);
                     if (newOfficeCount <= 0) {
-                        console.debug("Client is the last of the office. Unsubbing...");
+                        logger.debug("Client is the last of the office. Unsubbing...");
                         _clientsPerOffice.delete(officeNum);
                         RedisConnector.removeTopic(officeNum);
                     } else {
-                        console.debug("Reducing client count by 1 as others in the same office are still connected.");
+                        logger.debug("Reducing client count by 1 as others in the same office are still connected.");
                         _clientsPerOffice.set(officeNum, newOfficeCount);
                     }
                 }

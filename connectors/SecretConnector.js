@@ -6,6 +6,8 @@ let _initialized = false;
 let client;
 
 exports.setup = async () => {
+    logger.debug(`[SecretConnector] Initializing`);
+
     if(_initialized)
         return;
     try {

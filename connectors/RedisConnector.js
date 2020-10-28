@@ -32,6 +32,8 @@ exports.getClientCount = async (officeID) => {
 };
 
 exports.setup = async () => {
+    logger.debug(`[RedisConnector] Initializing`);
+
     if(_initialized)
         return false;
     const redisURL = await SecretConnector.getSecret('redis-uri');

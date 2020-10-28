@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const logger = require('../Logger');
 const SecretConnector = require('../connectors/SecretConnector');
-const TimerModel = require('../connectors/datastore/TimerDSConnector');
+const TimerDSConnector = require('../connectors/datastore/TimerDSConnector');
 const RedisConnector = require('../connectors/RedisConnector');
 
 let _initialized = false;
@@ -10,6 +10,8 @@ let _initialized = false;
 let jwtSecret;
 
 exports.setup = async () => {
+    logger.debug(`[AuthHandler] Initializing`);
+
     if(_initialized)
         return;
     let secret = await SecretConnector.getSecret('jwt-secret');

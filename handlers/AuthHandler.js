@@ -41,7 +41,15 @@ exports.handleAuth = async (socket, token) => {
         return false;
     }
 
-    const jwtData = await verifyJWT(token);
+    if(!token)
+        return;
+
+    let jwtData;
+    try {
+        jwtData = await verifyJWT(token);
+    } catch (e) {
+        return;
+    }
 
     if (!jwtData) {
         socket.emit('auth.error', 'Invalid JWT provided.');

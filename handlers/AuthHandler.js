@@ -80,6 +80,6 @@ exports.handleAuth = async (socket, token) => {
 exports.postAuth = async (socket) => {
     socket.emit('server.info', {"server.name": process.env.POD_NAME || "development"});
     socket.emit('clock.status', new Date().getTime());
-    socket.emit('timers', await TimerModel.getAllOfficeTimers(socket.office));
+    socket.emit('timers', await TimerDSConnector.getAllOfficeTimers(socket.office));
 };
 

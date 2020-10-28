@@ -1,6 +1,6 @@
 const {CloudTasksClient} = require('@google-cloud/tasks');
 const SecretConnector = require('./SecretConnector');
-
+const logger = require('../Logger');
 let _initialized = false;
 
 let pusherSecret;
@@ -11,6 +11,8 @@ let parent;
 
 
 exports.setup = async() => {
+    logger.debug(`[NotificationConnector] Initializing`);
+
     if(_initialized)
         return false;
     try {
@@ -63,5 +65,5 @@ exports.scheduleNotification = async (timer) => {
 };
 
 exports.cancelNotification = async (notification) => {
-    await client.deleteTask({name:notification});
+    await client.deleteTask({name:notification}).catch(err=> {});
 };

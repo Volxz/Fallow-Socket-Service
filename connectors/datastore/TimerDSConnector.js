@@ -8,6 +8,8 @@ let datastore;
 let _initialized = false;
 
 exports.setup = async ()=> {
+    logger.debug(`[TimerDSConnector] Initializing`);
+
     if(_initialized)
         return false;
     try {
@@ -19,8 +21,8 @@ exports.setup = async ()=> {
 };
 
 exports.update = async (timerData) => {
-    console.debug(`Beginning update of timer with dataset ${JSON.stringify(timerData)}`);
-    const {id, name, length, expires_at, office} = timerData;
+    logger.debug(`Updating timer ${JSON.stringify(timerData)}`);
+    const {id, name, length, expires_at, office, notification} = timerData;
     const key = await datastore.key({
         namespace: `office-${office}`,
         path: [type, id]
@@ -28,13 +30,15 @@ exports.update = async (timerData) => {
     const timer = {
         key,
         data: {
-            name, length, expires_at, office
+            name, length, expires_at, office, notification
         }
     };
     await datastore.save(timer);
 };
 
 exports.delete = async (timer, office) => {
+    logger.debug(`Deleting timer ${JSON.stringify(timer)}`);
+
     const key = await datastore.key({
         namespace: `office-${office}`,
         path: [type, timer.id]
@@ -43,6 +47,7 @@ exports.delete = async (timer, office) => {
 };
 
 exports.create = async (timerData) => {
+    logger.debug(`Creating timer ${JSON.stringify(timerData)}`);
     const {id, name, length, expires_at, office} = timerData;
     const key = await datastore.key({
         namespace: `office-${office}`,
@@ -58,14 +63,22 @@ exports.create = async (timerData) => {
 };
 
 exports.get = async (id, office) => {
+    logger.debug(`Getting Timer ${id}`);
     const key = await datastore.key({
         namespace: `office-${office}`,
         path: [type, id]
     });
-    return await datastore.get(key);
+    const [timer] = await datastore.get(key);
+    if(!timer) {
+        logger.debug(`Could not retrieve timer ${id} in office ${office}`);
+        return null;
+    }
+    timer.id = timer[datastore.KEY]['name'];
+    return timer;
 };
 
 exports.getAllOfficeTimers = async (officeNum) => {
+    logger.debug(`Getting all office timers for office ` + officeNum);
     const query = datastore.createQuery(`office-${officeNum}`, 'Timer');
     const [data] =  await datastore.runQuery(query);
     let idTimers = [];
